@@ -1,0 +1,51 @@
+= Exception handling
+
+== The Throwable family
+
+- Throwable
+  - Error
+  - Exception
+    - RuntimeException
+    - IOException
+    - SQLException
+    - ...
+
+== Checked vs. unchecked exceptions
+
+- Checked exceptions
+  - Must be handled or declared
+  - Usually indicates a problem outside of the program
+  - Subclasses of `Exception` that are not `RuntimeException`
+
+- Unchecked exceptions
+    - Do not have to be handled or declared
+    - Usually indicates a problem inside of the program
+    - Subclasses of `RuntimeException` or `Error`
+
+
+== Overriding methods with declared exceptions
+- The exception declared in an overriding method cannot be more general than the exception declared in the overridden method
+- The overriding method can declare no exceptions even if the overridden method declares exceptions
+
+- Example
+
+[source,java]
+----
+import java.io.IOException;//This will compile
+class A {
+    void foo() throws IOException {}
+}
+
+class B extends A {
+    void foo() throws FileNotFoundException {}
+}
+
+// However, this will not compile since FileNotFoundException is a subclass of IOException
+class A {
+    void foo() throws FileNotFoundException {}
+}
+
+class B extends A {
+    void foo() throws IOException {}
+}
+----
