@@ -242,3 +242,164 @@ public class ExceptionHandlingExample {
 - When having the finally block, the catch block is optional
 - If there are return statements in the try block, the catch block and the finally block, the return statement in the finally block will be executed just before the method returns
 - The finally block will not be executed if the JVM exits while the try or catch block is being executed (e.g. System.exit() is called)
+
+== Try with resources
+- The try-with-resources statement is a try statement that declares one or more resources
+- A resource is an object that must be closed after the program is finished with it
+- The try-with-resources statement ensures that each resource is closed at the end of the statement
+- Any object that implements java.lang.AutoCloseable, which includes all objects which implement java.io.Closeable, can be used as a resource
+- The resources declared in the try block are effectively final, you cannot reassign them
+- You can declare the resources outside of the try block, but you cannot declare them again in the try block
+- Example
+[source,java]
+----
+public class TryWithResourcesExample {
+    public static void main(String[] args) {
+        try (BufferedReader br = new BufferedReader(new FileReader("test.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println("IOException occurred");
+        }
+    }
+}
+----
+- Behind the scene, try with resources is translated to the following code
+[source,java]
+----
+public class TryWithResourcesExample {
+    public static void main(String[] args) {
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader("test.txt"));
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println("IOException occurred");
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    System.out.println("IOException occurred");
+                }
+            }
+        }
+    }
+}
+----
+- As you can see, there is an implicit finally block that closes the resource
+- As a programmer, you still can declare your finally block, however the implicit finally block will be executed first
+- When writing try with resources, the resources are closed in the reverse order of their creation
+- The catch block is optional when using try with resources
+- You can declare multiple resources in the try with resources statement, the resources are separated by semicolons
+- Example
+[source,java]
+----
+public class TryWithResourcesExample {
+    public static void main(String[] args) {
+        try (BufferedReader br = new BufferedReader(new FileReader("test.txt"));
+             BufferedWriter bw = new BufferedWriter(new FileWriter("test2.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                bw.write(line);
+            }
+        } catch (IOException e) {
+            System.out.println("IOException occurred");
+        }
+    }
+}
+----
+- The resources declared are scoped to the try block, you cannot access the resources outside of the try block (e.g. in the catch block or the finally block)
+
+=== Order of execution in try with resources
+- The following is the order in which the resources are closed
+- Consider the following code block
+[source,java]
+----
+class SomeExamples {
+    static class MyResource implements AutoCloseable {
+        private String resourceName;
+        public MyResource(String resourceName) {
+            this.resourceName = resourceName;
+        }
+        @Override
+        public void close() throws Exception {
+            System.out.println("Closing " + resourceName);
+        }
+    }
+
+    public static void main(String[] args) {
+        try (MyResource myResource1 = new MyResource("First");
+             MyResource myresource2 = new MyResource("Second")) {
+            System.out.println("In Try Block");
+            throw new RuntimeException();
+        } catch (Exception e) {
+            System.out.println("In Catch Block");
+        } finally {
+            System.out.println("In Finally Block");
+        }
+    }
+
+    //The order of output when running main:
+    //In Try Block
+    //Closing Second
+    //Closing First
+    //In Catch Block
+    //In Finally Block
+
+}
+
+----
+
+=== Throwing exception in resource
+- If an exception is thrown in the try block and another exception is thrown while closing the resources, the exception thrown while closing the resources will be suppressed
+- The exception in the try block is called the primary exception, the exception thrown while closing the resources is called the suppressed exception
+
+- Example
+[source,java]
+----
+class SuppressedExceptionDemo {
+
+    static class MyProblematicResource implements AutoCloseable {
+        private String resourceName;
+        public MyProblematicResource(String resourceName) {
+            this.resourceName = resourceName;
+        }
+        @Override
+        public void close() throws Exception {
+            System.out.println("Closing " + resourceName);
+            throw new Exception("Exception in close method");
+        }
+    }
+
+    public static void main(String[] args) {
+        try (var resource = new MyProblematicResource("First")) {
+            System.out.println("In Try Block");
+            throw new RuntimeException("Exception in try block");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println("Exception in catch block");
+            for (Throwable t : e.getSuppressed()) {
+                System.out.println(t.getMessage());
+            }
+        } finally {
+            System.out.println("In Finally Block");
+        }
+    }
+}
+----
+- Executing the code above will produce the following output
+[source]
+----
+In Try Block
+Closing First
+Exception in try block
+Exception in catch block
+Exception in close method
+In Finally Block
+----
