@@ -1,0 +1,9 @@
+= Building blocks
+
+== The JDK ==
+- The JDK is the Java Development Kit. It is a set of tools that allow you to develop Java applications.
+- Common binary excutables are:
+  * `javac` - the Java compiler, this turns Java source code into Java bytecode
+  * `java` - the Java interpreter, this runs Java bytecode
+  * `javadoc` - the Java documentation generator
+  * `jar` - the Java archive tool, this creates and extracts Java archives
