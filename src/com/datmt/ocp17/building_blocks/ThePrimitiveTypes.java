@@ -46,7 +46,6 @@ public class ThePrimitiveTypes {
         int base16 = 0x64;//base 16, 0 to 9 and A to F (case insensitive), prefixed by 0x
 
 
-
         //# Casting
         // Implicit casting (from smaller to larger)
         int i1 = 1;
@@ -74,5 +73,47 @@ public class ThePrimitiveTypes {
 
 //        System.out.println(c1 == c2);
 
+    }
+}
+
+class PrimitiveWrapper {
+    public static void main(String[] args) {
+        //* Primitive cannot be null
+        //int i = null;//this will not compile
+        //if you need to assign null to a primitive(technically not possible),
+        // use wrapper classes
+
+        //# Wrapper classes
+        //1. Boolean
+        Boolean b = true;
+        Boolean b1 = null;
+        Boolean b2 = Boolean.valueOf("true");
+        Boolean b3 = Boolean.valueOf(false);
+        Boolean b4 = Boolean.valueOf("false");
+
+        System.out.println("value of false" + b4);
+        //2. Byte
+        Byte by = 1;//8 bits, min: -128, max: 127
+        Byte by2 = Byte.valueOf("1");
+
+
+        //3. Short
+        Short s = 2;//16 bits, min: -32,768, max: 32,767
+        Short s2 = Short.valueOf("2");
+        //4. Int
+        Integer i = 3;//32 bits, min: -2,147,483,648, max: 2,147,483,647
+        Integer i2 = Integer.valueOf("3");
+        Integer i3 = Integer.parseInt("44");
+        //5. Long
+        Long l = 4L;//64 bits, min: -9,223,372,036,854,775,808, max: 9,223,372,036,854,775,807
+
+        //6. Float
+        Float f = 5.0f;//32 bits, min: 1.4E-45, max: 3.4028235E38
+
+        //7. Double
+        Double d = 6.0;//64 bits, min: 4.9E-324, max: 1.7976931348623157E308
+
+        //8. Char
+        Character c = 'a';//16 bits Unicode value, min: 0, max: 65,535, 16-bit
     }
 }
