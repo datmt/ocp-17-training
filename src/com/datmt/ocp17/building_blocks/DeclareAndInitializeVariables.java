@@ -189,6 +189,10 @@ class ClassAndInstanceVariableScope {
 }
 
 class GarbageCollectionDemo {
+   //Garbage collection is the process of automatically freeing memory
+   //It is not guaranteed that the garbage collector will run
+
+
    //A variable is eligible for garbage collection when
    //there are no more references to the variable
 
